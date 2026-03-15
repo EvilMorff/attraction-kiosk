@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, initial-scale=1">
+<title>Аттракціони</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="wave-top" id="waveTop">
+<svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+<path d="M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,0 L0,0 Z"></path>
+</svg>
+</div>
+
+<img src="images/logo.png" id="logo">
+
+<div id="menu">
+
+  <div class="rideCard" onclick="openHurricane()">
+    <img src="images/hurricane.png" class="rideImage">
+    <div class="rideBtn">HURRICANE</div>
+  </div>
+
+  <div id="cardDefender" class="rideCard" onclick="playDefender()">
+    <img src="images/defender.png" class="rideImage">
+    <div class="rideBtn">DEFENDER</div>
+  </div>
+  
+  <div id="rulesBtn" onclick="openRules()">
+НОРМИ ДОПУСКУ
+</div>
+
+</div>
+
+<div id="rulesPage">
+
+<button id="rulesBack" onclick="closeRules()">⬅ Назад</button>
+
+<div class="rulesContent">
+
+<div class="rulesColumn">
+
+<img src="images/hurricane.png" class="rulesRideImage">
+
+<h2>HURRICANE</h2>
+
+<p>• Зріст: від 142 до 203 см</p>
+<p>• Максимальне навантаження на одне місце: 150 кг</p>
+
+</div>
+
+
+<div class="rulesColumn">
+
+<img src="images/defender.png" class="rulesRideImage">
+
+<h2>DEFENDER</h2>
+
+<p>• Зріст: від 110 до 210 см</p>
+<p>• Максимальне навантаження на одне місце: 150 кг</p>
+
+</div>
+
+</div>
+<div class="rulesBottomText">
+<p>• Адміністрація парку не несе відповідальності за цілістність та збереження особистих речей відвідувачів.</p>
+<p>• Після запуску атракціонів, якщо з якихось причин відвідувач відмовляється продовжувати сеанс, кошти не повертаються.</p>
+<p>• Шолом віртуальної реальності одягається тільки після посадки в модуль.</p>
+<p>• Вибір ролика здійснюється відвідувачем після консультації з оператором.</p>
+
+</div>
+
+
+
+</div>
+
+<div id="hurricaneMenu" style="display:none">
+
+<button id="backBtn" onclick="goHome()">⬅ Назад</button>
+
+<div id="videoList"></div>
+
+<div id="pagination">
+
+<button onclick="prevPage()">⬅</button>
+
+<span id="pageInfo"></span>
+
+<button onclick="nextPage()">➡</button>
+
+</div>
+
+</div>
+
+
+<div id="player" style="display:none">
+
+<button id="backBtn" onclick="goBack()">⬅ Назад</button>
+
+<video id="video" autoplay></video>
+
+</div>
+
+
+<script>
+
+function openRules(){
+
+document.getElementById("logo").classList.add("logoHide")
+
+document.getElementById("menu").classList.add("menuSlideDown")
+
+document.getElementById("rulesPage").classList.add("rulesShow")
+
+rulesTimer = setTimeout(()=>{
+
+closeRules()
+
+},20000)
+
+}
+
+function closeRules(){
+
+clearTimeout(rulesTimer)
+
+document.getElementById("rulesPage").classList.remove("rulesShow")
+
+setTimeout(()=>{
+
+document.getElementById("menu").classList.remove("menuSlideDown")
+
+document.getElementById("logo").classList.remove("logoHide")
+
+},800)
+
+}
+
+let rulesTimer
+
+function playDefender(){
+
+videoSource="defender"
+
+document.getElementById("logo").style.display="none"
+
+let card=document.getElementById("cardDefender")
+
+card.classList.add("zoomToCenter")
+
+setTimeout(()=>{
+
+playVideo("video/defender.mp4")
+
+},700)
+
+}
+
+let videoSource = ""
+
+let hurricaneVideos=[
+
+{file:"video/hurricane/video1.mp4", name:"ARABIAN NIGHT", time:"3:39"},
+{file:"video/hurricane/video2.mp4", name:"CHRISTMAS", time:"2:22"},
+{file:"video/hurricane/video3.mp4", name:"DINO COASTER", time:"3:21"},
+{file:"video/hurricane/video4.mp4", name:"FLY BIKE", time:"3:11"},
+{file:"video/hurricane/video5.mp4", name:"HURRI 1", time:"4:11"},
+{file:"video/hurricane/video6.mp4", name:"HURRI 2", time:"3:45"},
+{file:"video/hurricane/video7.mp4", name:"HURRI 3", time:"3:49"},
+{file:"video/hurricane/video8.mp4", name:"ISLAND COASTER", time:"3:18"},
+{file:"video/hurricane/video9.mp4", name:"MISSION MARS", time:"3:15"},
+{file:"video/hurricane/video10.mp4", name:"MOTORIDE 1", time:"3:49"},
+{file:"video/hurricane/video11.mp4", name:"MOTORIDE 2", time:"3:46"},
+{file:"video/hurricane/video12.mp4", name:"PLANET", time:"3:15"},
+{file:"video/hurricane/video13.mp4", name:"WASTELAND", time:"3:29"},
+{file:"video/hurricane/video14.mp4", name:"WOC", time:"4:07"}
+
+]
+
+
+let page=0
+let perPage=8
+
+let idleTimer
+let watchingVideo=false
+
+
+function resetIdleTimer(){
+
+clearTimeout(idleTimer)
+
+if(!watchingVideo){
+
+idleTimer=setTimeout(()=>{
+
+goHome()
+
+},60000)
+
+}
+
+}
+
+document.addEventListener("click",resetIdleTimer)
+document.addEventListener("touchstart",resetIdleTimer)
+
+
+
+function openHurricane(){
+
+watchingVideo=false
+
+document.getElementById("logo").style.display="none"
+
+document.getElementById("menu").style.display="none"
+document.getElementById("hurricaneMenu").style.display="flex"
+
+page=0
+
+renderPage()
+
+resetIdleTimer()
+
+}
+
+
+
+function renderPage(){
+
+let list=document.getElementById("videoList")
+
+list.innerHTML=""
+
+let start=page*perPage
+let end=start+perPage
+
+let items=hurricaneVideos.slice(start,end)
+
+items.forEach(v=>{
+
+let btn=document.createElement("button")
+
+btn.innerHTML = `
+<span class="videoTitle">${v.name}</span>
+<span class="videoDivider">|</span>
+<span class="videoTime">${v.time}</span>
+`
+
+btn.onclick=()=>{
+videoSource="hurricane"
+playVideo(v.file)
+}
+
+list.appendChild(btn)
+
+})
+
+let totalPages=Math.ceil(hurricaneVideos.length/perPage)
+
+document.getElementById("pageInfo").innerText=
+"Сторінка "+(page+1)+" / "+totalPages
+
+}
+
+
+
+function nextPage(){
+
+let totalPages=Math.ceil(hurricaneVideos.length/perPage)
+
+if(page<totalPages-1){
+
+page++
+
+renderPage()
+
+}
+
+}
+
+
+
+function prevPage(){
+
+if(page>0){
+
+page--
+
+renderPage()
+
+}
+
+}
+
+
+
+function playVideo(src){
+
+document.getElementById("waveTop").style.display="none";
+document.getElementById("waveBottom").style.display="none";
+
+watchingVideo=true
+
+clearTimeout(idleTimer)
+
+document.getElementById("menu").style.display="none"
+document.getElementById("hurricaneMenu").style.display="none"
+document.getElementById("player").style.display="block"
+
+let video=document.getElementById("video")
+
+video.src=src
+
+video.play()
+
+video.onended = () => {
+
+watchingVideo = false
+
+if(videoSource === "hurricane"){
+
+document.getElementById("player").style.display="none"
+document.getElementById("hurricaneMenu").style.display="flex"
+
+}else{
+
+goHome()
+
+}
+
+}
+
+}
+
+
+
+function stopVideo(){
+
+let video=document.getElementById("video")
+
+video.pause()
+
+video.currentTime=0
+
+video.src=""
+
+watchingVideo=false
+
+}
+
+
+
+function goBack(){
+
+document.getElementById("waveTop").style.display="block";
+document.getElementById("waveBottom").style.display="block";
+
+stopVideo()
+
+document.getElementById("player").style.display="none"
+
+let card=document.getElementById("cardDefender")
+card.classList.remove("zoomToCenter")
+
+if(videoSource==="hurricane"){
+
+document.getElementById("hurricaneMenu").style.display="flex"
+document.getElementById("logo").style.display="none"
+
+}else{
+
+document.getElementById("menu").style.display="flex"
+document.getElementById("logo").style.display="block"
+
+}
+
+resetIdleTimer()
+
+}
+
+
+
+function goHome(){
+
+document.getElementById("logo").style.display="block";
+
+document.getElementById("waveTop").style.display="block";
+document.getElementById("waveBottom").style.display="block";
+
+stopVideo()
+
+document.getElementById("player").style.display="none"
+document.getElementById("hurricaneMenu").style.display="none"
+
+document.getElementById("menu").style.display="flex"
+
+let card=document.getElementById("cardDefender")
+card.classList.remove("zoomToCenter")
+
+resetIdleTimer()
+
+}
+
+</script>
+
+<div class="wave-bottom" id="waveBottom">
+<svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+<path d="M0,60 C240,0 480,120 720,60 C960,0 1200,120 1440,60 L1440,120 L0,120 Z"></path>
+</svg>
+</div>
+
+</body>
+</html>
