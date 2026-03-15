@@ -1,11 +1,9 @@
 const { app, BrowserWindow } = require('electron')
 const { autoUpdater } = require('electron-updater')
 
-let win
-
 function createWindow () {
 
-  win = new BrowserWindow({
+  const win = new BrowserWindow({
     fullscreen: true,
     kiosk: true,
     autoHideMenuBar: true
@@ -22,15 +20,8 @@ app.whenReady().then(() => {
   // Проверка обновлений
   autoUpdater.checkForUpdatesAndNotify()
 
-  // Проверка каждые 10 минут
-  setInterval(() => {
-    autoUpdater.checkForUpdates()
-  }, 600000)
-
 })
 
-
-// Когда обновление скачано
 autoUpdater.on('update-downloaded', () => {
 
   autoUpdater.quitAndInstall()
